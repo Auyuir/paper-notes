@@ -1,17 +1,17 @@
-# Quartz v5
+# Paper Notes
 
-> “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
+论文阅读笔记公开存档，使用 [Quartz v5](https://quartz.jzhao.xyz/) 渲染，部署在 GitHub Pages。
 
-Quartz is a set of tools that helps you publish your [digital garden](https://jzhao.xyz/posts/networked-thought) and notes as a website for free.
+站点地址：https://auyuir.github.io/paper-notes
 
-🔗 Read the documentation and get started: https://quartz.jzhao.xyz/
+## 更新笔记
 
-[Join the Discord Community](https://discord.gg/cRFFHYye7t)
+内容从私有 Obsidian vault 同步而来。更新流程：
 
-## Sponsors
+```bash
+bash gpu-learning-journal/sync-paper-notes.sh
+cd paper-notes
+git add -A && git commit -m "sync: 更新论文笔记" && git push
+```
 
-<p align="center">
-  <a href="https://github.com/sponsors/jackyzha0">
-    <img src="https://cdn.jsdelivr.net/gh/jackyzha0/jackyzha0/sponsorkit/sponsors.svg" />
-  </a>
-</p>
+推送后 GitHub Actions 会自动构建并部署。
