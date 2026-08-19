@@ -2,13 +2,13 @@
 
 ## 0. 论文基本信息
 
-**作者 (Authors)**: Comet Authors, et al.
+**作者 (Authors)**: (作者提取失败，待补充)
 
 **发表期刊/会议 (Journal/Conference)**: ArXiv
 
 **发表年份 (Publication Year)**: 2024
 
-**研究机构 (Affiliations)**: Unknown
+**研究机构 (Affiliations)**: (机构提取失败，待补充)
 
 ---
 
