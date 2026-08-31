@@ -70,7 +70,7 @@ SGLang 没有去重新训练模型，也没有去魔改 Transformer 架构，而
 - 正确的做法是：大家共享 `main` 分支的编译产物（KV cache），每个新分支只需要计算自己新增的那几行代码（新 Token）。
 - RadixAttention 就是干这个的。它把所有历史请求的 KV cache 挂在一棵 Radix Tree 上。新请求来了，先在树上“寻址”，找到最长公共前缀，直接复用现成的“编译产物”，只对差异部分进行计算。
 
-![](images/example_radix_attn.png)
+![](images/example-radix-attn.png)
 
 ---
 
