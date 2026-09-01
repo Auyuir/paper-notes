@@ -11,7 +11,6 @@
 **研究机构 (Affiliations)**: Architect Labs
 
 ---
-
 ## 1. 摘要
 
 **目的**
@@ -556,4 +555,3 @@ CTM 不仅是 FE 与 BE 的桥梁，更承担了复杂的硬件级调度与跨�
 ![](images/9b81894c049c6c387f721c5496734dad30dcea7a59e13acc9a1e5b9841d9ec4b.jpg) *Fig. 15: Requirements for recursive self-improvement.*
 
 ---
-

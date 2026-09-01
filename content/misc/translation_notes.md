@@ -20,7 +20,7 @@ EDA行业目前报告称，AI在RTL生成、验证、调试和探索方面带来
 
 ## II. 架构
 
-![](images/35949b40b7c9d3ad3d4648a4a226110af095e96c2c42bc5fdfca24e827795e75.jpg)  
+![](images/35949b40b7c9d3ad3d4648a4a226110af095e96c2c42bc5fdfca24e827795e75.jpg)
 图 1：Redwood SoC 架构。
 
 Redwood 是一个基于瓦片的空间数据流加速器，使用标准的 AXI4 内存映射接口：AXI-Lite 用于控制和配置，而支持完全突发传输的宽 AXI4 用于批量数据（图 1）。专用的 DMA 引擎将所有流量移入和移出外部 DRAM。全局 DMA（GDMA）结构在外部内存和片上 West、North 和 East 末级 SRAM 组（LLC）之间执行批量内存到内存的传输，而边缘 DMA 引擎负责在计算结构上暂存数据。全局控制区域对加速器进行排序，并包含全局控制核心（MCU）、全局任务管理器和一个48位全局定时器（HAC），该定时器广播到每个瓦片以进行时间隔离调度。该区域启动、编排并清理诸如 FlashAttention [7] 和 GEMM/GEMV 等内核。由于内存接口仅限于模块化 DMA 引擎，Redwood 可以集成到更大的 SoC 中，也可以封装为独立的 chiplet。DMA 后端也可以从 AXI4 重新定向到诸如 ACE 和 CHI 等协议，而不会干扰计算结构。
@@ -31,19 +31,19 @@ Redwood 是一个基于瓦片的空间数据流加速器，使用标准的 AXI4 
 
 Redwood fabric 中的每个 tile 分为前端（FE）和后端（BE），如图 2 所示。FE 负责控制和编程，而 BE 负责数据移动和计算。将稀疏控制与高带宽数据处理分离，使得 FE 可以在较慢的时钟域中运行，并且在某些情况下，可以在 kernel 执行期间关闭以实现显著的功耗节省。Kernel 软件在 tile 控制核心（CRV）上运行，而核心任务管理器（CTM）连接 CRV 和 BE 功能单元，并协调跨可配置单元集的任务。
 
-![](images/2b7554909144192f9e8a138da31274700c440f1b178755bcc3c2ca0120681c38.jpg)  
+![](images/2b7554909144192f9e8a138da31274700c440f1b178755bcc3c2ca0120681c38.jpg)
 图 2：Redwood tile 架构。
 
 tile BE 内的硬件单元是为现代 transformer 工作负载（包括设备端 prefill 和 decode）协同设计的。计算单元包括用于矩阵运算的 GEMV 和 GEMM 引擎，由阵列化的基于整数的乘加（MAC）单元构建；以及用于逐元素运算的多通道 SIMD 引擎，由阵列化的浮点单元（FPU）构建，能够处理归约、基于 LUT 的操作等（图 3）。一项优化使用了来自 FlashAttention-4 [8] 的模拟 softmax 算法，该算法复用现有的 SIMD 资源来执行原本面积开销较大的操作。这些功能单元和 CRV 通过高带宽总线共享对本地 512-KB 核心存储器（CMEM）的访问。本地入口和出口 DMA 引擎负责将数据移入和移出 CMEM。
 
-![](images/869f38be789a14a00eb3812aa11425f5c5d4c232b6e2796988fc7c84b75fd031.jpg)  
+![](images/869f38be789a14a00eb3812aa11425f5c5d4c232b6e2796988fc7c84b75fd031.jpg)
 图 3：标准 Redwood tile BE 单元。
 
 ## B. 控制机制
 
 要使用 Redwood tile 进行计算，首先将 kernel 加载到 FE 指令紧耦合存储器（ITCM）中。然后，核心调试、跟踪和控制（CDTC）单元启动裸机 tile 控制核心（CRV）。CRV 等待通过 CDTC 传递到数据紧耦合存储器（DTCM）的函数调用，然后执行选定的 kernel 函数。kernel 函数通常会扩展为几次 MMIO 写入，将 CTM 任务排入队列以便分派到相应的功能单元。只要多个 kernel 调用的实现驻留在 ITCM 中，就可以将它们排入队列。整体的 FE-BE 协调如图 4 所示。
 
-![](images/bb7e96ceb83a233f8bb2b5c78e005f252e41a26c4964136e424c21beefbac84e.jpg)  
+![](images/bb7e96ceb83a233f8bb2b5c78e005f252e41a26c4964136e424c21beefbac84e.jpg)
 图 4：Redwood FE-BE 协调。
 
 FE 和 BE 之间的这种解耦提供了以下好处：
@@ -64,12 +64,12 @@ CTM 原生支持：
 
 CTM 任务也可以通过 Redwood SoC 消息 fabric 携带的外部“消息”进行栅栏操作，该 fabric 连接所有 CTM。跨核心和 CTM 的系统级消息传递如图 5 所示。
 
-![](images/359895db840f525dd3c84f9602125a394282f9a4ce4f4d0e0778201b803ae200.jpg)  
+![](images/359895db840f525dd3c84f9602125a394282f9a4ce4f4d0e0778201b803ae200.jpg)
 图 5：Redwood CTM 消息网络。
 
 消息允许 CTM 在不涉及 CRV 或 MCU 的情况下对控制流进行排序。在图 6 的代表性示例中，位于 (0,0) 的 tile 向西和向东的 DMA 引擎发送交错消息，这些 DMA 引擎的 CTM 在释放下一个任务之前等待“放行”消息。通信也可以沿相反方向流动，由 DMA CTM 向 tile CTM 发信号以向下游发送数据。消息可以配置为即发即忘或基于确认的模式。编译器使用消息来协调预取、双缓冲和乱序计算。通过消息进行显式流量控制减少了 mesh 中复杂仲裁的需求，并将调度移入软件栈。
 
-![](images/d293c3217fcb3abeb533ac889fc079ba3d66e728cf4dfcc3c3f48dc9c15d0a19.jpg)  
+![](images/d293c3217fcb3abeb533ac889fc079ba3d66e728cf4dfcc3c3f48dc9c15d0a19.jpg)
 图 6：Redwood CTM 消息流示例。
 
 ## III. 编程模型
@@ -98,7 +98,7 @@ DP 可以轮询状态或依赖 tile 中断来确定 tile 阵列何时完成。�
 
 5. 当 DP 完成时，MCU 中断主机处理器以指示执行已完成，且预留的输入和输出缓冲区可供主机使用。
 
-![](images/324527900adfb64a479fb724a4811d0329167bd16abc57fa11e172e66cc258b.jpg)  
+![](images/324527900adfb64a479fb724a4811d0329167bd16abc57fa11e172e66cc258b.jpg)
 图 7：Redwood 调度和 kernel 执行流程。
 
 如果整个模型所需的 DP 或 kernel 集无法放入 ITCM，主机处理器会在运行时将它们分区加载并分组，以尽量减少交换。
@@ -109,13 +109,13 @@ Redwood Nano 是 Redwood 的 FPGA 配置，专为超低功耗、低延迟的边�
 
 我们测量了 LLM decode 性能，以每秒输出 token 数表示，包括峰值和平均吞吐量。对于 Redwood Nano，测量包括从主机向 FPGA 发送 prompt、在 FPGA 上运行 Qwen，以及将每个输出 token 返回给主机。NVIDIA Jetson Orin Nano 在 1020 MHz GPU 时钟下运行相同的模型，性能使用 NVIDIA 的 Jetson WebUI 测量。表 I 展示了基准比较。
 
-![](images/76805ede9df1aa74b859b43b3b4f05ff86a12a7db3934fc29325f81c63d2353f.jpg)  
+![](images/76805ede9df1aa74b859b43b3b4f05ff86a12a7db3934fc29325f81c63d2353f.jpg)
 图 8：Redwood Nano FPGA 布局和实例化层次结构。
 
 表 I：Redwood Nano 与 NVIDIA Jetson GPU 在 Qwen3-0.6B LLM 推理上的性能比较。
 <table><tr><td>比较</td><td>Redwood Nano</td><td>NVIDIA GPU Jetson Orin Nano</td></tr><tr><td>平均 Tokens/s (*)</td><td>12.1</td><td>28</td></tr><tr><td>频率</td><td>250</td><td>1020</td></tr><tr><td>内存带宽</td><td> $1 6 ^ { * * }$</td><td>68</td></tr><tr><td>内存类型</td><td>LPDDR4</td><td>LPDDR5</td></tr></table>
 
-\*在生成的 128 个 token 上测量。  
+\*在生成的 128 个 token 上测量。
 \*\*Redwood 在 250MHz 峰值可达频率、4x 128 位 AXI4 流下的 DRAM 内存带宽。
 
 ## A. Redwood 峰值解码吞吐量的 Roofline 分析
@@ -178,24 +178,24 @@ $$
 
 在不到两周的时间内，整个 Redwood 完成了设计、验证、综合与物理设计准备，并作为 Redwood Nano FPGA 配置进行了部署。该加速器从零开始打造，没有任何预先存在的加速器 IP。这不仅得益于训练我们自己的模型、构建智能体框架以及构建 AI 原生 EDA 工具，还得益于对从软件到硅片的硬件设计流程的根本性重新思考。传统的芯片设计生命周期高度串行，从架构定义到最终流片逐步推进。在此过程中，相关产物会被“冻结”，变更要么临时进行，要么留待下一代。硬件团队采用流水线方式开发，因此，在版本 N 冻结后，相应的团队便开始版本 N+1（图 9）。这使得大型硬件公司能够以 9 到 12 个月的节奏发布新硬件。
 
-![](images/a31331d5614b68be6487ab55fce6acfe18499385c3679e0885204c5a3c9207f9.jpg)  
+![](images/a31331d5614b68be6487ab55fce6acfe18499385c3679e0885204c5a3c9207f9.jpg)
 图 9：传统 ASIC 项目的代表性生命周期。
 
 虽然其吞吐量可能可以接受，但这种串行方法的延迟使得真正的软硬件（HW-SW）协同设计变得不切实际。在当前的 AI 领域，当架构被定义且 RTL 设计和验证正在进行时，新模型可能会使数月的优化失效。因此，硬件团队必须预测工作负载的发展方向，并添加通用功能作为对冲。
 
 Architect Labs 流程尽可能实现自动化和并行化，消除了“冻结”的要求，并支持灵活的架构探索和端到端实现。它围绕 Architect Labs Platform (ALP) 构建，这是我们用于端到端芯片设计的内部平台（图 10）。一旦设计意图在 ALP 中被捕获，自动化流程就会生成 RTL、UVM 产物、SVA 断言、形式化证明和其他工件。在规范以下不需要人工干预；人类专家在整个项目生命周期中维护 ALP，并利用功能、面积、性能、时序和功耗反馈来调整规范或设计意图。
 
-![](images/e797f87415806ad4f07079554627d79b9469cbf288259090402c61930aa06870.jpg)  
+![](images/e797f87415806ad4f07079554627d79b9469cbf288259090402c61930aa06870.jpg)
 图 10：Architect Labs Platform 与端到端芯片设计流程。
 
 这种自动化流程的一个关键好处是人类和智能体可以并行探索多种架构想法。对于 Redwood，每次架构迭代都会在 48 小时内重新生成、重新验证并重新部署到 FPGA。完整的设计周期，从初始规范到最终 RTL、验证、固件、自定义内核和时序收敛，耗时两周，所有模块均达到了 95% 的代码和功能覆盖率。第三周将目标工作负载（即新 AI 模型）引入 FPGA；完整的三周项目时间线如图 11 所示。
 
-![](images/0b9ac1812176dd866eff4e1034614dd5e6eef3f862ac7a392caefd1b27703ce8.jpg)  
+![](images/0b9ac1812176dd866eff4e1034614dd5e6eef3f862ac7a392caefd1b27703ce8.jpg)
 图 11：Redwood 设计过程历史，提取自存储库提交。
 
 图 12 显示了项目生命周期内 AI 系统的存储库合并提交历史。在将目标工作负载上线并持续优化 Redwood 的固件和内核期间，AI 系统在一天内达到了 115 次合并提交的峰值。
 
-![](images/22bdd0f093e790372b924e619a9638f98e98d805f0ddd829d68aa0256ad360ec.jpg)  
+![](images/22bdd0f093e790372b924e619a9638f98e98d805f0ddd829d68aa0256ad360ec.jpg)
 图 12：Redwood 存储库提交活动。
 
 ## A. 自动化设计验证与覆盖率收敛
@@ -208,10 +208,10 @@ Redwood 的测试平台生成、测试用例开发和覆盖率收敛已完全自
 
 由于 RTL 设计在我们的流程中是完全自动化的，系统可以探索比人类团队在相同时间内所能覆盖的微架构搜索空间大一个数量级的空间。考虑我们的 SIMD 引擎，它跨多个向量通道执行降低精度的浮点和整数运算。尽管单个通道的开发和复制很简单，但诸如 reduce、max 和 min 等归约操作跨越所有通道。通过在更长的时间跨度内运行更多系统实例，我们可以发现大量新颖的候选方案。在图 13 和图 14 所示的示例中，我们的 AI 系统在多天内遍历了性能-面积-时序搜索空间，在设计、验证和优化的同时保持了代码覆盖率和验证的严谨性。
 
-![](images/f796c5e81b11a5d06a34e22542c26c77811582fffdc33543aa6d53f8fa9d898d.jpg)  
+![](images/f796c5e81b11a5d06a34e22542c26c77811582fffdc33543aa6d53f8fa9d898d.jpg)
 图 13：自主 SIMD 引擎探索路径。
 
-![](images/d32cc2b4355fef4e9a2f242fe02b388ac6301203fc231218889c0eb72e6f8df6.jpg)  
+![](images/d32cc2b4355fef4e9a2f242fe02b388ac6301203fc231218889c0eb72e6f8df6.jpg)
 图 14：针对性能、面积、时序和代码覆盖率的 SIMD 引擎微架构探索与优化。
 
 先前的自动化微架构探索方法通常局限于位宽调整或寄存器重排等更改。在这里，生成的 RTL 候选方案可以使用根本不同的控制路径、数据路径和状态机，并且可以自由地找到超越人类认为最优的解决方案。随着我们的技术扩展，我们预计探索质量将受限于可用算力而非人类洞察力，并且随着该上限的升高，系统将呈现超出最优秀人类设计师认知极限的架构。
@@ -228,7 +228,7 @@ ALP 的一个优势在于，它允许在编写任何 RTL 或验证产物之前�
 
 如今，能够自主设计硬件的 AI 系统的能力与实际能够部署在此类硬件上的 AI 模型的能力之间存在着差距，如图 15 所示。随着我们的 AI 系统不断扩展到更复杂的硬件设计，并且我们弥合了这一不匹配，持续由 AI 驱动的现代硬件改进将成为 AI 进展的最大驱动力之一。我们认为这是对递归自我改进最清晰的衡量。
 
-![](images/9b81894c049c6c387f721c5496734dad30dcea7a59e13acc9a1e5b9841d9ec4b.jpg)  
+![](images/9b81894c049c6c387f721c5496734dad30dcea7a59e13acc9a1e5b9841d9ec4b.jpg)
 图 15：递归自我改进的要求。
 
 ## VI. 结论
