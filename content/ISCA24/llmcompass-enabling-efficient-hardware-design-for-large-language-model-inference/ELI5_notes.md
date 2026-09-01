@@ -160,7 +160,7 @@
 | Normalized performance | 0.95 | 1.0 |
 | Normalized perf/cost | **1.06** | 1.0 |
 
-![](images/0ef2325a780837696db7581d1682ead58a60f8a1a5a88c8fe6ceadabcb0ac2853.jpg)
+![](images/0ef2325a780837696db7581d1682ead58a60f8a1a588c8fe6ceadabcb0ac2853.jpg)
 
 - 从图里可以清楚看到，砍掉一半计算力后，**TBT（Decoding延迟）几乎没变**，只有**TTFT（Prefill延迟）** 有明显上升。
 - 这个设计的精妙之处在于：它不是盲目裁剪，而是**基于对负载特征的深刻洞察**，精准地裁掉了那个在特定场景下"不干活还费钱"的部分。
