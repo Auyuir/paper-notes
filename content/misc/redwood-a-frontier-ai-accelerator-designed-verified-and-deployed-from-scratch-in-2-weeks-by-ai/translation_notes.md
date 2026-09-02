@@ -109,7 +109,7 @@ Redwood Nano 是 Redwood 的 FPGA 配置，专为超低功耗、低延迟的边�
 
 我们测量了 LLM decode 性能，以每秒输出 token 数表示，包括峰值和平均吞吐量。对于 Redwood Nano，测量包括从主机向 FPGA 发送 prompt、在 FPGA 上运行 Qwen，以及将每个输出 token 返回给主机。NVIDIA Jetson Orin Nano 在 1020 MHz GPU 时钟下运行相同的模型，性能使用 NVIDIA 的 Jetson WebUI 测量。表 I 展示了基准比较。
 
-![](images/76805ede9df1aa74b859b43b3b4f05ff86a12a7db3934fc29325f81c63d2353f.jpg)
+![](images/76805ede9df1aa74b859b43b3b4f05ff86a12a7db39c4fc29325f81c63d2353f.jpg)
 图 8：Redwood Nano FPGA 布局和实例化层次结构。
 
 表 I：Redwood Nano 与 NVIDIA Jetson GPU 在 Qwen3-0.6B LLM 推理上的性能比较。
