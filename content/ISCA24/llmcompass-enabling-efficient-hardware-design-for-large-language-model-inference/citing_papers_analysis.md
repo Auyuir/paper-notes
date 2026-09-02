@@ -5,27 +5,39 @@
 
 ## 方法
 
-1. **数据源**：Semantic Scholar Academic Graph API，`/paper/{id}/citations`，一次性拉取全部 **91** 篇施引文献的完整元数据（citation contexts、intents、venue、abstract、isInfluential、citationCount、externalIds）。
-2. **过滤**：5 路并行 subagent 逐篇判定，分类维度 = `extends / uses / baseline-compares / background-mention` × `venue tier / influential`。
-3. **标定验证**：
-   - ✅ `Combating the Memory Walls` (ISCA'26, 实质仿真) → 正确保留
-   - ✅ `WSC-LLM` (ISCA'25, related-work 轻提) → 正确排除
+1. **数据源（双源并集）**：
+   - Semantic Scholar：`/paper/{id}/citations`，拉取 **91** 篇施引文献（含 citation contexts、intents、venue、abstract、isInfluential、externalIds）。
+   - OpenAlex：`filter=cites:W4401211642`，拉取 **56** 篇；与 S2 去重后得 **18 篇 delta**（S2 漏掉的引文边，如 SMOOTH）。delta 无引文上下文，用 S2 by-DOI 补 abstract/tldr 后判定。
+   - 合计去重后约 **109** 篇唯一施引文献。
+2. **过滤**：S2 91 篇分 5 路、OpenAlex 18 篇 delta 分 2 路并行 subagent 逐篇判定。
+3. **判据（已拧紧）**：KEEP 仅限**明确运行/扩展 LLMCompass 做仿真**（摘要或上下文出现 "we use/extend/integrate LLMCompass to simulate/evaluate/model..."）；**仅引用其结论/数据**（即使不在 related work 段）= 排除。
+4. **标定验证**：
+   - ✅ `SMOOTH` (ISCA'26, 集成 LLMCompass 做周期精确评估) → 保留（OpenAlex delta 发现，S2 漏）
+   - ✅ `WSC-LLM` (ISCA'25, related-work 轻提) → 排除
+   - ⚠️ `Combating the Memory Walls` (ISCA'26) → **初判误留**（误把"引用结论"当"实质仿真"），人工复核重读全文后**改判排除**。此案例暴露"仅凭引文上下文一句话"区分"用工具"与"引结论"不可靠，已据此拧紧判据。
 
 ## ⚠️ 覆盖缺口（重要）
 
-Semantic Scholar 的 91 篇 **少于** Google Scholar 的 129 篇。已发现一处遗漏：**SMOOTH (ISCA'26)** 在本仓库中明确"集成进 LLMCompass（ScaleSim 的 LLM 扩展）"做仿真，但**不在 S2 的 91 篇内**。因此本清单是**下限而非全集**——如需完备，应以 GS/SerpAPI 或 arXiv 全文检索交叉补漏。
+S2 的 91 篇 < GS 的 129 篇，且 S2 漏掉了 OpenAlex 有的 **18 条引文边**（含 SMOOTH）。根因经查证：S2 建引文边依赖参考消歧，**有 arXiv 预印本 + OA PDF** 的论文（如 Combating）被 S2ORC 全文解析干净建边；**无 arXiv、PDF 对 S2 CLOSED** 的论文（如 SMOOTH）只能靠 Crossref 存款，消歧失败率高、易漏边。OpenAlex 对 IEEE 存款的参考解析更鲁棒，故能补上 SMOOTH 等边。**结论：单靠 S2 会漏，必须 S2+OpenAlex 并集**。本清单仍为下限，GS/arXiv 全文检索可再补。
 
 ## 筛选结果概览
 
-- **保留 (KEEP)**：16 篇（实质利用 LLMCompass）
-- **边界 (MAYBE)**：~12 篇（证据不足或仅部分相关）
-- **排除 (EXCLUDE)**：~63 篇（related-work 仅提及 / 领域不匹配 / 水平低）
+- **保留 (KEEP)**：17 篇（实质利用 16 + 绕过对照 1）
+- **边界 (MAYBE)**：~21 篇（S2 侧 12 + OpenAlex delta 9，多数因无引文上下文、仅凭摘要无法确认是否真用了 LLMCompass）
+- **排除 (EXCLUDE)**：~71 篇（related-work 仅提及 / 引用结论 / 领域不匹配 / 水平低）
 
 ---
 
 ## 一、扩展 LLMCompass 作为核心组件（extends）
 
 这类工作直接修改/集成 LLMCompass 作为自身仿真后端，是"实质性继承"最强的一档。
+
+### [SMOOTH] SMOOTH: Hardware-Assisted Fine-Grained On-Chip Memory Management for Efficient On-Device LLM Inference  ★标定样例
+- **发表**：ISCA'26 | [DOI:10.1109/ISCA66397.2026.00057](https://doi.org/10.1109/ISCA66397.2026.00057) | cites=0（新）
+- **如何用**：摘要明示——"We implement SMOOTH in Verilog and **integrate it into LLMCompass**, an LLM-optimized extension of ScaleSim, for cycle-accurate evaluation."
+- **克服局限**：在 LLMCompass 之上做周期精确评估，验证 SMOOTH 的运行时 scratchpad 管理缓解自回归解码的突发流量/碎片（TTFT −59.2%、TTLT −73.0%、能耗 −51.2%）。
+- **数据源说明**：S2 漏了这条引文边（无 arXiv 版、PDF 对 S2 CLOSED，靠 Crossref 存款消歧失败），由 OpenAlex 补回。本仓库已收录。
+- **摘要**：面向端侧 LLM 推理的硬件辅助细粒度片上内存管理框架。
 
 ### [52] SPAD: Specialized Prefill and Decode Hardware for Disaggregated LLM Inference
 - **发表**：arXiv 预印本 (2025) | [arXiv:2510.08544](https://arxiv.org/abs/2510.08544) | cites=9, influential
@@ -69,11 +81,9 @@ Semantic Scholar 的 91 篇 **少于** Google Scholar 的 129 篇。已发现一
 
 这类工作直接运行 LLMCompass 做实验，但不改其代码。
 
-### [54] Combating the Memory Walls: Optimization Pathways for Long-Context Agentic LLM Inference (PLENA)  ★标定样例
+### ~~[54] Combating the Memory Walls (PLENA)~~ — ⚠️ 改判排除
 - **发表**：ISCA'26 | [DOI:10.1109/ISCA66397.2026.00023](https://doi.org/10.1109/ISCA66397.2026.00023) / [arXiv:2509.09505](https://arxiv.org/abs/2509.09505) | cites=13
-- **如何用**：基于 LLMCompass 仿真做 PLENA 的评估/协同设计。
-- **克服局限**：未扩展 LLMCompass 测试集——PLENA 自带 transaction-level 模拟器 + 自动 DSE 流程。
-- **摘要**：长上下文 agentic LLM 推理的硬软件协同设计加速器（扁平脉动阵列、非对称量化、FlashAttention）。本仓库已收录。
+- **改判原因**：经人工重读全文，该文**仅引用 LLMCompass 的结论**（关于 prefill/decode 硬件需求的启示），**并未用 LLMCompass 做仿真**——PLENA 自带 transaction-level 模拟器 + 自动 DSE 流程。初判因引文上下文含 PLENA 描述而误判为 "uses"，已据此教训拧紧判据。归入排除（结论引用型）。本仓库已收录该文笔记，仅供对照。
 
 ### [62] Chip Architectures Under Advanced Computing Sanctions
 - **发表**：ISCA'25 | [DOI:10.1145/3695053.3731012](https://doi.org/10.1145/3695053.3731012) | cites=3, influential
@@ -148,6 +158,8 @@ Semantic Scholar 的 91 篇 **少于** Google Scholar 的 129 篇。已发现一
 
 ## 五、边界候选（MAYBE，未深读，供人工二次判定）
 
+S2 侧（有引文上下文，但仍难定夺）：
+
 | idx | 标题 | 会议 | 不确定原因 |
 |----|------|------|-----------|
 | 33 | LUMINA: LLM-Guided GPU Architecture Exploration | arXiv | 领域对，contexts 空，疑似基线未证实 |
@@ -156,6 +168,20 @@ Semantic Scholar 的 91 篇 **少于** Google Scholar 的 129 篇。已发现一
 | 89 | LLM Inference on Chiplet-based Architectures | 未索引 | 明确"leverages LLMCompass"但无会议/摘要/cite |
 | 19 | CCL-Bench 1.0 | arXiv | 直击"小测试集"痛点，但仅 list 引用 LLMCompass |
 | 53 | SnipSnap | ASP-DAC | 引用 LLMCompass 的评测协议，主体为 list-mention |
+
+OpenAlex delta 侧（S2 漏的边，无引文上下文，仅凭摘要，更不确定）：
+
+| 来源 | 标题 | 会议 | 不确定原因 |
+|----|------|------|-----------|
+| OA-d3 | LP-Spec: LPDDR PIM for LLM Mobile Speculative Inference | ICCAD'25 | 顶会+领域对，摘要未点名 LLMCompass，需全文核验是仿真后端还是 related-work |
+| OA-d4 | Optically Connected Multi-Stack HBM Modules | IEEE CAL'25 | HBM for LLM，自称"A100 modeled baseline"，需核验是否基于 LLMCompass |
+| OA-d5 | SuperMesh: Collective Communications for Accelerators | SC/ASPLOS 系'25 | 加速器集合通信，非 LLM 专向，疑似 workload/related 提及 |
+| OA-d8 | EONSim: NPU Simulator for On-Chip Memory | IEEE CAL'26 | 自建 NPU 模拟器，疑似把 LLMCompass 列为 prior simulator |
+| OA-d11 | Wafer-Scale GPU Memory Pool w/ In-Package Optics | IEEE CAL'26 | 自建"HBM-pool"分析框架，未点名 LLMCompass |
+| OA-d15 | HydraPIM: Heterogeneous PIM for Attention | IEEE TC'26 | PIM 长上下文 LLM，对比 PIM 基线，需核验 LLMCompass 角色 |
+| OA-d16 | BlockPIM: Sparse LLM Inference on Dense PIM | IEEE CAL'26 | 与 DAC'25 [60] 同组疑似续作，需核验是否复用 LLMCompass |
+
+> **去重提示**：OA-d8 EONSim 与 S2 侧 [46] 疑为同篇（标题一致）但 DOI/年份形式差异导致自动去重未命中——人工合并时留意，勿重复计数。这暴露按 DOI+norm(title)+year 去重在版本/年份不一致时仍会漏。
 
 ---
 
@@ -168,4 +194,4 @@ Semantic Scholar 的 91 篇 **少于** Google Scholar 的 129 篇。已发现一
 | 带宽建模理想化 | DeepStack（bank 级真实带宽）、DFModel（片内 dataflow 映射，MAYBE） |
 | 无网络建模 | 未见施引文献补该缺口（LLMCompass 自身建议集成 ASTRA-sim） |
 
-**总体判断**：LLMCompass 被作为"快速 DSE 后端"广泛复用（extends/use 两类共 13 篇），其"小测试集"局限**基本未被正面解决**——这恰是你这篇 LLMCompass 综述/批判可切入的空白。
+**总体判断**：LLMCompass 被作为"快速 DSE 后端"广泛复用（extends/use 两类共 13 篇，含 SMOOTH 这类在 LLMCompass 之上做周期精确扩展的 ISCA 工作），其"小测试集"局限**基本未被正面解决**——这恰是你这篇 LLMCompass 综述/批判可切入的空白。注意 Combating the Memory Walls 一类"引用结论而非用工具"的论文会被误判，须以全文复核兜底。
