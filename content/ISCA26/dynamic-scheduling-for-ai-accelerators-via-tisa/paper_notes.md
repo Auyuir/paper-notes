@@ -143,6 +143,7 @@ TISA（Tile-Level Instruction Set Architecture）是一种**硬件消费的调�
 TISA的设计依赖于两个互补的数据结构，构成了编译器与运行时调度器之间的语义契约。
 
 Operand结构定义了数据属性与内存范围：
+
 | 字段 | 类型/约束 | 描述 |
 |---|---|---|
 | TileShape | Symbolic/Parametric | 计算边界 |
@@ -152,6 +153,7 @@ Operand结构定义了数据属性与内存范围：
 | scope | {Private, Local, Shared} | 内存层级 |
 
 TISA指令结构捕获算子语义与资源元数据：
+
 | 字段 | 类型/约束 | 描述 |
 |---|---|---|
 | OpType | {GEMM, SOFTMAX, ...} | 语义标识符 |

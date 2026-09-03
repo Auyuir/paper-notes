@@ -164,7 +164,7 @@ $$
 在评估候选指令 I 是否可以发射到单元 u 时，我们的动态调度器执行基于规则的冒险检测：
 
 $$
-\mathrm { H a z a r d } ( I , \mathcal { F } _ { u } ) = \exists r \in \mathcal { F } _ { u } : \mathsf { S e m a n t i c C o n f 1 i c t } ( I , r )
+\mathrm { H a z a r d } ( I , \mathcal { F } _ { u } ) = \exists r \in \mathcal { F } _ { u } : \mathsf { S e m a n t i c C o n f l i c t } ( I , r )
 $$
 
 其中 SemanticConflict 通过以下类型化规则来解决：
@@ -448,6 +448,7 @@ Task Superscalar [12]在同构CPU核心上实现粗粒度、依赖驱动的执�
 作为总结，表X在影响调度能力的维度上将TISA与现有方法进行比较。
 
 表X：TISA在ILP调度领域中的定位。
+
 | 方法 | 语义位于 | 调度位于 | 运行时 | 跨单元 | 硬件需求 |
 |---|---|---|---|---|---|
 | CPU | 寄存器 | 指令 | 是 | 单单元 | 复杂逻辑 |
