@@ -50,6 +50,7 @@ S2 的 91 篇 < GS 的 129 篇，且 S2 漏掉了 OpenAlex 有的 **18 条引文
 - **如何用**：ReaLLM 的 kernel simulator 直接构建在 LLMCompass 之上。
 - **克服局限**：**直接攻 LLMCompass 的"慢"**——"simulating each Matmul still takes a minute"；用预计算 kernel 库实现 6×/164× 加速，并叠加 trace 驱动的系统级执行分析（覆盖 batching/scheduling 行为，LLMCompass 所缺）。
 - **摘要**：在 LLMCompass 微架构 kernel 建模之上叠加系统级评估的 trace 驱动模拟器。
+- **仓内笔记**：[paper_notes](../../misc/reallm-a-trace-driven-framework-for-rapid-simulation-of-large-scale-llm-inference/paper_notes.md)（同目录另含 [ELI5](../../misc/reallm-a-trace-driven-framework-for-rapid-simulation-of-large-scale-llm-inference/ELI5_notes.md) / [翻译](../../misc/reallm-a-trace-driven-framework-for-rapid-simulation-of-large-scale-llm-inference/translation_notes.md) / [图表](../../misc/reallm-a-trace-driven-framework-for-rapid-simulation-of-large-scale-llm-inference/figs_notes.md) 三份报告）
 
 ### [41] RACAM: Enhancing DRAM with Reuse-Aware Computation and Automated Mapping for ML Inference
 - **发表**：arXiv (2025) | [arXiv:2512.09304](https://arxiv.org/abs/2512.09304) | cites=0, influential
