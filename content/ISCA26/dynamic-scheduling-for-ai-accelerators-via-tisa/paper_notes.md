@@ -144,13 +144,13 @@ TISA的设计依赖于两个互补的数据结构，构成了编译器与运行�
 
 Operand结构定义了数据属性与内存范围：
 
-| 字段 | 类型/约束 | 描述 |
-|---|---|---|
-| TileShape | Symbolic/Parametric | 计算边界 |
-| TileMem | (base, scope) | 内存规格 |
-| AccessType | {R, W, RW} | 访问模式 |
-| base | Address | 符号/常量地址 |
-| scope | {Private, Local, Shared} | 内存层级 |
+| 字段         | 类型/约束                    | 描述      |
+| ---------- | ------------------------ | ------- |
+| TileShape  | Symbolic/Parametric      | 计算边界    |
+| TileMem    | (base, scope)            | 内存规格    |
+| AccessType | {R, W, RW}               | 访问模式    |
+| base       | Address                  | 符号/常量地址 |
+| scope      | {Private, Local, Shared} | 内存层级    |
 
 TISA指令结构捕获算子语义与资源元数据：
 
@@ -384,14 +384,14 @@ Decentralized Semantics-Aware Hardware Scheduler 彻底改变了 AI 加速器的
 - **异构单元重叠得分**：动态调度大幅增加并发密度。以 BERT 为例，Dynamic 模式的累积重叠得分是 Naive 的 **18.29×**，是 Static 的 **5.17×**，证明运行时能有效捕捉跨算子、跨迭代的并行机会。
 - **与 GPU 基线端到端延迟对比**：在算力和带宽绝对劣势下，**Epoch (TISA)** 相比 **A100 (TensorRT)** 实现平均 **1.46×** 延迟降低。
 
-| Model | Configuration | Epoch | A100 | Speedup |
-| :--- | :--- | :--- | :--- | :--- |
-| **ResNet50** | FP16, batch=128 | 6.2ms | 9.3ms | **1.50×** |
-| **BERT-Base** | FP16, batch=64 | 7.5ms | 9.8ms | **1.31×** |
-| **GPT-J-6B** | FP16, prefill | 29.9ms | 37.3ms | **1.25×** |
-| **LLaMA2-13B** | FP16, prefill | 54.0ms | 77.1ms | **1.43×** |
-| **DeepSeek-R1-16B** | BF16, prefill | 213.5ms | 412.3ms | **1.93×** |
-| **DeepSeek-R1-16B** | BF16, decode | 51.2ms | 69.0ms | **1.35×** |
+| Model               | Configuration   | Epoch   | A100    | Speedup   |
+| :------------------ | :-------------- | :------ | :------ | :-------- |
+| **ResNet50**        | FP16, batch=128 | 6.2ms   | 9.3ms   | **1.50×** |
+| **BERT-Base**       | FP16, batch=64  | 7.5ms   | 9.8ms   | **1.31×** |
+| **GPT-J-6B**        | FP16, prefill   | 29.9ms  | 37.3ms  | **1.25×** |
+| **LLaMA2-13B**      | FP16, prefill   | 54.0ms  | 77.1ms  | **1.43×** |
+| **DeepSeek-R1-16B** | BF16, prefill   | 213.5ms | 412.3ms | **1.93×** |
+| **DeepSeek-R1-16B** | BF16, decode    | 51.2ms  | 69.0ms  | **1.35×** |
 
 - **FlashAttention-3 性能突破**：在 head dim 128 配置下，**Epoch** 相比 **H100** 的 SOTA 实现取得 **26.4%** 硬件利用率提升。即使 Epoch 内存带宽仅为 H100 的 30%（1.0TB/s vs 3.35TB/s），仍通过动态调度消除 GEMM 与 Softmax 的隐式同步屏障，实现更高有效算力。
 
