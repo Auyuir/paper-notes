@@ -4,7 +4,7 @@
 
 **作者 (Authors)**: Huwan Peng, Scott Davidson, C.-J. Richard Shi, et al.
 
-**发表期刊/会议 (Journal/Conference)**: unknown
+**发表期刊/会议 (Journal/Conference)**: ASAP(CCF-C)
 
 **发表年份 (Publication Year)**: 2026
 
@@ -332,7 +332,7 @@ ReaLLM采用**三阶段Trace-Driven仿真框架**，旨在弥合**Chip-Level**�
 - **端到端延迟验证**：
   - 在 4 张 H100 系统上运行 LLaMA-70B，90 条测试 trace 的平均端到端预测误差仅为 **9.1%**。
   - 早期差异主要源于系统预热效应与初始调度波动，后期准确度显著提升。
-![](images/5305d173c740be288bce94f049e5bbe25fac9b7ea0c2864cbd81e0beb17e4bfe.jpg)
+![](images/5305d173c740be28bce94f04f9e5bbe25fac9b7ea0c2864cbd81e0beb17e4bfe.jpg)
 - **瓶颈分析与性能扩展**：
   - 增加 tensor core 高度或计算核心数量可显著提升性能。
   - 提升 HBM 带宽收益有限。
@@ -341,7 +341,7 @@ ReaLLM采用**三阶段Trace-Driven仿真框架**，旨在弥合**Chip-Level**�
 - **工作负载差异分析**：
   - 相比 coding 任务，conversation 任务因每请求生成 token 更多，在系统中停留时间更长，导致更早出现延迟增长。
   - 维持相同 SLO 时，conversation 应用需要比 coding 应用更多的硬件资源。
-![](images/b66d5fe7bae75a7991bea1a4019bae3f813f7a7ce73e1c3ad4a7620d11b1d63fd.jpg)
+![](images/b66d5fe7bae75a7991be1a4019bae3f813f7a7ce73e1c3ad4a7620d11b1d63fd.jpg)
 - **映射策略影响**：
   - 不同映射策略（loop blocking、loop ordering、double buffering）对 Matmul 内核执行周期影响巨大。
   - 选择最佳的 loop ordering 可将延迟降低一个数量级，凸显微架构级内核模拟的重要性。
