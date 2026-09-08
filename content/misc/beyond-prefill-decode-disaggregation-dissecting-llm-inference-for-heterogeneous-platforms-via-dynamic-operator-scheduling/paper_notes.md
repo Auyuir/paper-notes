@@ -135,7 +135,7 @@
 
 本文提出了 **DOPS (Dynamic Operator Scheduling)** 框架，这是一个硬件感知的闭环优化系统，专门针对异构 **NPU-PIM** 平台上的 **LLM Inference** 场景。该框架将算子调度与权重布局优化形式化为一个耦合问题，通过构建阶段感知的 **DAG**，联合优化执行时间与内存开销。
 
-![](images/649f067c3884e9266bc1f22584535da3b24071ed87c0a0e4161c875d79747d0b.jpg)
+![](images/649f067c3884c9266bc1f22584535da3b24071ed87c3a0e4161c875d79747d0b.jpg)
 
 ---
 
@@ -436,7 +436,7 @@ WLA在严格内存约束下，为主存中的持久化权重块选择硬件高�
 - 模拟与验证误差
   - 模拟与实际验证加速比之间的Signed Gap维持在**-4%至+6%**区间，证明DOPS性能模型具备高保真度。
 
-![](images/737626ae51e220563e9a7de1223ba5574542a13081126cf2d7e5b96f0070134.jpg)
+![](images/737626ae51e2205673e9a7de1223ba5574542a13081126cf2d7e5b96f0070134.jpg)
 
 - 设备利用率与协同计算
   - DOPS未孤立最大化NPU或PIM利用率，而是实现最高的**CoUtil**（时间平均重叠利用率）。
@@ -447,7 +447,7 @@ WLA在严格内存约束下，为主存中的持久化权重块选择硬件高�
 - 硬件扩展性与边际收益
   - 增加PIM容量总体有益，但边际收益受Workload配置显著影响。
 
-![](images/bcece7ebf1e566decd6a5b288b45788fcb29c74ee016757629a8deeb79f5f4e.jpg)
+![](images/bcece7eb8f1e566decd6a5b288b45788fcb29c74ee016757629a8deeb79f5f4e.jpg)
 
   - **Insight 1**：更长的Prefill长度将最高收益点推向更大PIM容量（因KV cache流量与attention内存成本增加）。
   - **Insight 2**：更长的Decode长度同样导致收益点右移（因内存访问重复性高，大PIM预算更易均摊成本）。
